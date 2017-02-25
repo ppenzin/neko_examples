@@ -1,0 +1,18 @@
+var thread_create       = $loader.loadprim("std@thread_create", 2)
+var thread_current      = $loader.loadprim("std@thread_current", 0)
+var thread_read_message = $loader.loadprim("std@thread_read_message", 1)
+var thread_send         = $loader.loadprim("std@thread_send", 2)
+
+var main = thread_current();
+
+var f = function(n) {
+  $print("Hello from thread ", n, "\n");
+  thread_send(main, "done");  // For lack of thread_wait
+};
+
+thread_create(f, 1);
+thread_create(f, 2);
+
+// For lack of thread_wait
+thread_read_message(true);
+thread_read_message(true);

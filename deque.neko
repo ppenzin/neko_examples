@@ -1,0 +1,21 @@
+var thread_create = $loader.loadprim("std@thread_create", 2)
+var deque_create  = $loader.loadprim("std@deque_create", 0)
+var deque_add     = $loader.loadprim("std@deque_add", 2)
+var deque_pop     = $loader.loadprim("std@deque_pop", 2)
+
+var q = deque_create();
+
+var f = function(n) {
+  var message = "Hello from thread " + n;
+  deque_add(q, message);
+};
+
+thread_create(f, 1);
+thread_create(f, 2);
+
+/* Consume messages */
+var message = deque_pop(q, false);
+while (message != null) {
+  $print(message, "\n");
+  message = deque_pop(q, false);
+}

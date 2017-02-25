@@ -1,0 +1,6 @@
+var thread_create = $loader.loadprim("std@thread_create", 2)
+
+var f = function(n) { $print("Hello from thread ", n, "\n"); };
+
+thread_create(f, 1);
+thread_create(f, 2);

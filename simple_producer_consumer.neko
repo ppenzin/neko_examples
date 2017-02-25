@@ -1,0 +1,37 @@
+var thread_create       = $loader.loadprim("std@thread_create", 2)
+var deque_create        = $loader.loadprim("std@deque_create", 0)
+var deque_add           = $loader.loadprim("std@deque_add", 2)
+var deque_pop           = $loader.loadprim("std@deque_pop", 2)
+// Entirely for waiting for child threads to finish:
+var thread_current      = $loader.loadprim("std@thread_current", 0)
+var thread_read_message = $loader.loadprim("std@thread_read_message", 1)
+var thread_send         = $loader.loadprim("std@thread_send", 2)
+
+var main = thread_current();
+var q    = deque_create();
+
+/* Put messages on the queue */
+var producer = function(n) {
+  var message = "Hello from thread " + n;
+  deque_add(q, message);
+  thread_send(main, "done"); // Allow main to wait for us
+};
+
+/* Consume messages from the queue */
+var consumer = function(n) {
+  var message = deque_pop(q, false);
+  while (message != null) {
+    $print("Consumer ", n, " received: ", message, "\n");
+    message = deque_pop(q, false);
+  }
+  thread_send(main, "done"); // Allow main to wait for us
+};
+
+thread_create(producer, 1);
+thread_create(producer, 2);
+thread_create(consumer, 1);
+
+// Simulate thread_wait:
+thread_read_message(true);
+thread_read_message(true);
+thread_read_message(true);
